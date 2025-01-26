@@ -11,8 +11,7 @@ initial state of memory; then we ‘run’ the program by directly
 interpreting its text, given that initial state.
 
 """
-import sys, cgitb
-cgitb.enable(format='text')
+import sys
 
 def debug(text):
     sys.stderr.write(text + "\n")
@@ -171,8 +170,7 @@ def write_out():
     count = stack.pop()
     address = stack.pop()
     debug('writing address %d, count %d' % (address, count))
-    sys.stdout.write(''.join([chr(memory[ii])
-                              for ii in range(address, address+count)]))
+    sys.stdout.buffer.write(bytes(memory[address:address+count]))
 
 def quit():
     sys.exit(0)
@@ -274,11 +272,11 @@ def tbfrun():
     while True:
         run_time_dispatch[get_token()]()
 
-def main(infile):
+def main():
     global program
-    program = infile.read()
+    with open(sys.argv[1], 'r') as infile: program = infile.read()
     tbfcompile()
     tbfrun()
     assert False, "tbfrun returned"
 
-if __name__ == '__main__': main(file(sys.argv[1]))
+if __name__ == '__main__': main()
